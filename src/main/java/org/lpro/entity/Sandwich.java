@@ -13,8 +13,8 @@ import java.io.Serializable;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@NamedQuery(name="Category.findAll", query = "SELECT c FROM Category c")
-public class Category implements Serializable {
+@NamedQuery(name="Sandwich.findAll", query = "SELECT c FROM Sandwich c")
+public class Sandwich implements Serializable{
 
     @Id
     @GeneratedValue
@@ -24,16 +24,24 @@ public class Category implements Serializable {
     private String nom;
 
     @NotNull
-    private String descr;
+    private String description;
 
-    public Category() {
+    @NotNull
+    private String type_pain;
+
+    @NotNull
+    private String img;
+
+    public Sandwich() {
 
     }
 
-    public Category(long id, String nom, String descr) {
+    public Sandwich(long id, String nom, String description, String type_pain, String img) {
         this.id = id;
         this.nom = nom;
-        this.descr = descr;
+        this.description = description;
+        this.type_pain = type_pain ;
+        this.img = img ;
     }
 
     public long getId() {
@@ -45,8 +53,12 @@ public class Category implements Serializable {
     }
 
     public String getDescr() {
-        return this.descr;
+        return this.description;
     }
+
+    public String getType_pain() { return this.type_pain; }
+
+    public String getImg() { return this.img; }
 
     public void setId(long id) {
         this.id = id;
@@ -57,7 +69,12 @@ public class Category implements Serializable {
     }
 
     public void setDescr(String descr) {
-        this.descr = descr;
+        this.description = descr;
     }
+
+    public void setType_pain(String type_pain) { this.type_pain = type_pain; }
+
+    public void setImg(String img) { this.img = img; }
+
 
 }

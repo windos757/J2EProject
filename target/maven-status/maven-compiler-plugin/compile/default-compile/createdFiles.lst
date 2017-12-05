@@ -1,7 +1,0 @@
-org/lpro/boundary/CategoryResource.class
-com/airhacks/JAXRSConfiguration.class
-org/lpro/boundary/CategoryManager.class
-org/lpro/boundary/CategoryNotFound.class
-org/lpro/boundary/ValidationMapper.class
-org/lpro/entity/Category.class
-org/lpro/boundary/CategoryNotFoundMapper.class
