@@ -8,12 +8,13 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @NamedQuery(name="Category.findAll", query = "SELECT c FROM Category c")
-public class Category {
+public class Category implements Serializable {
 
     @Id
     @GeneratedValue
