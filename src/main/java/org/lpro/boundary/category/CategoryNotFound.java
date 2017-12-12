@@ -1,4 +1,4 @@
-package org.lpro.boundary;
+package org.lpro.boundary.category;
 
 public class CategoryNotFound extends RuntimeException {
     public CategoryNotFound(String s) {
