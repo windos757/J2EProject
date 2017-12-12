@@ -26,14 +26,14 @@ public class SandwichResource {
     @Inject
     SandwichManager sandwichManager;
 
-    @GET
-    public Response getSandwichs() {
-        JsonObject json = Json.createObjectBuilder()
-                .add("type", "collection")
-                .add("sandwichs", getSandwichsList())
-                .build();
-        return Response.ok(json).build();
-    }
+//    @GET
+//    public Response getSandwichs() {
+//        JsonObject json = Json.createObjectBuilder()
+//                .add("type", "collection")
+//                .add("sandwichs", getSandwichsList())
+//                .build();
+//        return Response.ok(json).build();
+//    }
 
     @GET
     @Path("{id}")
@@ -44,10 +44,18 @@ public class SandwichResource {
     }
 
     @GET
-    public Response getSandwichs(@QueryParam("type") String ptype) {
-        return Optional.ofNullable(sandwichManager.findByType(ptype))
-                .map(c -> Response.ok(c).build())
-                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    public Response getSandwichs(
+            @DefaultValue("1") @QueryParam("page") int page,
+            @DefaultValue("10") @QueryParam("size") int nbPerPage,
+            @QueryParam("t") String ptype,
+            @DefaultValue("0") @QueryParam("img") int img
+    ) {
+        JsonObject json = Json.createObjectBuilder()
+                .add("type", "collection")
+                .add("meta", this.sandwichManager.getMetaPerPage(-1, ptype, img, page, nbPerPage))
+                .add("sandwichs", this.getSandwichsList(ptype,img, page, nbPerPage))
+                .build();
+        return Response.ok(json).build();
     }
 
     @POST
@@ -61,7 +69,7 @@ public class SandwichResource {
     @DELETE
     @Path("{id}")
     public Response deleteSandwich(@PathParam("id") long id) {
-        this.SandwichManager.delete(id);
+        this.sandwichManager.delete(id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
@@ -72,30 +80,52 @@ public class SandwichResource {
         return this.sandwichManager.save(sandwich);
     }
 
-    private JsonObject sandwich2Json(Sandwich sandwich) {
-        return Json.createObjectBuilder()
-                .add("type", "resource")
-                .add("sandwich", buildJson(sandwich))
-                .build();
-    }
 
-    private JsonArray getSandwichsList() {
+    private JsonArray getSandwichsList(String ptype, int img, int page, int nbPerPage) {
         JsonArrayBuilder jab = Json.createArrayBuilder();
-        this.sandwichManager.findAll().forEach((c) -> {
+        this.sandwichManager.find(ptype, img,true, page, nbPerPage).forEach((c) -> {
             jab.add(buildJson(c));
         });
         return jab.build();
     }
 
 
+    private JsonObject buildJson(Sandwich s) {
+        JsonObject details = Json.createObjectBuilder()
+                .add("id", s.getId())
+                .add("nom", s.getNom())
+                .add("description", s.getDescr())
+                .add("pain", s.getType_pain())
+                .build();
 
-    private JsonObject buildJson(Sandwich sandwich) {
+        JsonObject href = Json.createObjectBuilder()
+                .add("href", ((s.getImg() == null) ? "" : s.getImg()))
+                .build();
+
+        JsonObject self = Json.createObjectBuilder()
+                .add("self", href)
+                .build();
+
         return Json.createObjectBuilder()
-                .add("id", sandwich.getId())
-                .add("nom", sandwich.getNom())
-                .add("descr", sandwich.getDescr())
-                .add("type_pain", sandwich.getType_pain())
-                .add("img", sandwich.getImg())
+                .add("sandwich", details)
+                .add("links", self)
+                .build();
+    }
+
+    private JsonObject sandwich2Json(Sandwich s) {
+        return Json.createObjectBuilder()
+                .add("type", "resource")
+                .add("sandwich", Json.createObjectBuilder()
+                        .add("id", s.getId())
+                        .add("nom", s.getNom())
+                        .add("description", s.getDescr())
+                        .add("pain", s.getType_pain())
+                        .build())
+                .add("links", Json.createObjectBuilder()
+                        .add("self", Json.createObjectBuilder()
+                                .add("href", ((s.getImg() == null) ? "" : s.getImg()))
+                                .build())
+                        .build())
                 .build();
     }
 }
