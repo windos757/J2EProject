@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.persistence.NamedQueries;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -13,7 +14,24 @@ import java.io.Serializable;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@NamedQuery(name="Sandwich.findAll", query = "SELECT c FROM Sandwich c")
+@NamedQueries({
+
+        @NamedQuery(name="Sandwich.findAll",
+                query = "SELECT c FROM Sandwich c"),
+
+        @NamedQuery(name = "Sandwich.type",
+                query = "SELECT s FROM Sandwich s " +
+                        "WHERE s.type_pain = :type ORDER BY s.id "),
+
+        @NamedQuery(name="Sandwich.type.img",
+                query = "SELECT s FROM Sandwich s " +
+                        "WHERE s.type_pain = :type AND s.img != NULL ORDER BY s.id "),
+
+        @NamedQuery(name="Sandwich.img",
+                query = "SELECT s FROM Sandwich s " +
+                        "WHERE s.img != NULL  ORDER BY s.id "),
+})
+
 public class Sandwich implements Serializable{
 
     @Id

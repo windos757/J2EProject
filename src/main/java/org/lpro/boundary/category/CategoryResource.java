@@ -1,4 +1,4 @@
-package org.lpro.boundary;
+package org.lpro.boundary.category;
 
 import org.lpro.entity.Category;
 

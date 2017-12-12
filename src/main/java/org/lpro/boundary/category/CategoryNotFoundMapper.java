@@ -1,4 +1,4 @@
-package org.lpro.boundary;
+package org.lpro.boundary.category;
 
 import javax.json.Json;
 import javax.json.JsonObject;
