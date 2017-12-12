@@ -39,9 +39,14 @@ public class SandwichResource {
     @Path("{id}")
     public Response getSandwich(@PathParam("id") long id, @Context UriInfo uriInfo) {
         return Optional.ofNullable(sandwichManager.findById(id))
-                //.map(c -> Response.ok(category2Json(c)).build())
                 .map(c -> Response.ok(c).build())
-                //.orElseThrow(() -> new CategoryNotFound("Ressource non disponible " + uriInfo.getPath()))
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    @GET
+    public Response getSandwichs(@QueryParam("type") String ptype) {
+        return Optional.ofNullable(sandwichManager.findByType(ptype))
+                .map(c -> Response.ok(c).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 
@@ -81,6 +86,8 @@ public class SandwichResource {
         });
         return jab.build();
     }
+
+
 
     private JsonObject buildJson(Sandwich sandwich) {
         return Json.createObjectBuilder()

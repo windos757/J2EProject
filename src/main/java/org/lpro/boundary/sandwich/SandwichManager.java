@@ -22,6 +22,13 @@ public class SandwichManager {
         return q.getResultList();
     }
 
+    public List<Sandwich> findByType(String ptype){
+        Query q = this.em.createNamedQuery("Sandwich.type", Sandwich.class);
+        q.setHint("javax.persistence.cache.storeMode", CacheStoreMode.REFRESH);
+        q.setParameter("type", ptype);
+        return q.getResultList();
+    })
+
     public Sandwich save(Sandwich sandwich) {
         return this.em.merge(sandwich);
     }

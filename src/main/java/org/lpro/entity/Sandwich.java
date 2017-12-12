@@ -13,7 +13,15 @@ import java.io.Serializable;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@NamedQuery(name="Sandwich.findAll", query = "SELECT c FROM Sandwich c")
+@NamedQueries({
+        @NamedQuery(name = "Sandwich.type",
+                query = "SELECT s FROM Sandwich s " +
+                        "WHERE s.type = :type ORDER BY s.id DESC"),
+
+        @NamedQuery(name="Sandwich.findAll",
+                query = "SELECT c FROM Sandwich c")
+})
+
 public class Sandwich implements Serializable{
 
     @Id
