@@ -1,6 +1,6 @@
-package org.lpro.boundary;
+package org.lpro.boundary.sandwich;
 
-import org.lpro.entity.Category;
+import org.lpro.entity.Sandwich;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -18,27 +18,27 @@ import java.net.URI;
 import java.util.Optional;
 
 @Stateless
-@Path("categories")
+@Path("sandwichs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class CategoryResource {
+public class SandwichResource {
 
     @Inject
-    CategoryManager categoryManager;
+    SandwichManager sandwichManager;
 
     @GET
-    public Response getCategories() {
+    public Response getSandwichs() {
         JsonObject json = Json.createObjectBuilder()
                 .add("type", "collection")
-                .add("categories", getCategoriesList())
+                .add("sandwichs", getSandwichsList())
                 .build();
         return Response.ok(json).build();
     }
 
     @GET
     @Path("{id}")
-    public Response getCategory(@PathParam("id") long id, @Context UriInfo uriInfo) {
-        return Optional.ofNullable(categoryManager.findById(id))
+    public Response getSandwich(@PathParam("id") long id, @Context UriInfo uriInfo) {
+        return Optional.ofNullable(sandwichManager.findById(id))
                 //.map(c -> Response.ok(category2Json(c)).build())
                 .map(c -> Response.ok(c).build())
                 //.orElseThrow(() -> new CategoryNotFound("Ressource non disponible " + uriInfo.getPath()))
@@ -46,8 +46,8 @@ public class CategoryResource {
     }
 
     @POST
-    public Response createCategory(@Valid Category category, @Context UriInfo uriInfo) {
-        Category newOne = this.categoryManager.save(category);
+    public Response createSandwich(@Valid Sandwich sandwich, @Context UriInfo uriInfo) {
+        Sandwich newOne = this.sandwichManager.save(sandwich);
         long id = newOne.getId();
         URI uri = uriInfo.getAbsolutePathBuilder().path("/" + id).build();
         return Response.created(uri).build();
@@ -55,38 +55,40 @@ public class CategoryResource {
 
     @DELETE
     @Path("{id}")
-    public Response deleteCategory(@PathParam("id") long id) {
-        this.categoryManager.delete(id);
+    public Response deleteSandwich(@PathParam("id") long id) {
+        this.SandwichManager.delete(id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @PUT
     @Path("{id}")
-    public Category updateCategory(@PathParam("id") long id, Category category) {
-        category.setId(id);
-        return this.categoryManager.save(category);
+    public Sandwich updateSandwich(@PathParam("id") long id, Sandwich sandwich) {
+        sandwich.setId(id);
+        return this.sandwichManager.save(sandwich);
     }
 
-    private JsonObject category2Json(Category category) {
+    private JsonObject sandwich2Json(Sandwich sandwich) {
         return Json.createObjectBuilder()
                 .add("type", "resource")
-                .add("category", buildJson(category))
+                .add("sandwich", buildJson(sandwich))
                 .build();
     }
 
-    private JsonArray getCategoriesList() {
+    private JsonArray getSandwichsList() {
         JsonArrayBuilder jab = Json.createArrayBuilder();
-        this.categoryManager.findAll().forEach((c) -> {
+        this.sandwichManager.findAll().forEach((c) -> {
             jab.add(buildJson(c));
         });
         return jab.build();
     }
 
-    private JsonObject buildJson(Category category) {
+    private JsonObject buildJson(Sandwich sandwich) {
         return Json.createObjectBuilder()
-                .add("id", category.getId())
-                .add("nom", category.getNom())
-                .add("descr", category.getDescr())
+                .add("id", sandwich.getId())
+                .add("nom", sandwich.getNom())
+                .add("descr", sandwich.getDescr())
+                .add("type_pain", sandwich.getType_pain())
+                .add("img", sandwich.getImg())
                 .build();
     }
 }
