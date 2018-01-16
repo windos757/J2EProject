@@ -10,6 +10,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.ManyToMany;
 
 @Entity
 @XmlRootElement
@@ -50,6 +53,9 @@ public class Sandwich implements Serializable{
     @NotNull
     private String img;
 
+    @ManyToMany(mappedBy = "sandwich")
+    private Set<Category> category = new HashSet<Category>();
+    
     public Sandwich() {
 
     }
@@ -62,6 +68,15 @@ public class Sandwich implements Serializable{
         this.img = img ;
     }
 
+    public Set<Category> getCategory(){
+        return this.category;
+    }
+    
+    
+    public void setCategory(Set<Category> c){
+        this.category = c;
+    }
+    
     public long getId() {
         return this.id;
     }

@@ -16,6 +16,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.Optional;
+import java.util.Set;
+import org.lpro.entity.Sandwich;
 
 @Stateless
 @Path("categories")
@@ -26,6 +28,8 @@ public class CategoryResource {
     @Inject
     CategoryManager categoryManager;
 
+    
+    
     @GET
     public Response getCategories() {
         JsonObject json = Json.createObjectBuilder()
@@ -34,7 +38,7 @@ public class CategoryResource {
                 .build();
         return Response.ok(json).build();
     }
-
+    
     @GET
     @Path("{id}")
     public Response getCategory(@PathParam("id") long id, @Context UriInfo uriInfo) {
@@ -43,6 +47,48 @@ public class CategoryResource {
                 .map(c -> Response.ok(c).build())
                 //.orElseThrow(() -> new CategoryNotFound("Ressource non disponible " + uriInfo.getPath()))
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+        
+  
+    
+    @GET
+    @Path("{id}/sandwichs")
+    public Response getSandwichs(@PathParam("id") long id) {
+        return Optional.ofNullable(this.categoryManager.findById(id))
+                .map(c -> Response.ok(buildSandwichs(c)).build())
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+    
+    private JsonObject buildSandwichs(Category c) {
+        JsonArrayBuilder sandwichs = Json.createArrayBuilder();
+        c.getSandwich().forEach((s) -> {
+            sandwichs.add(buildJsonForSandwich(s));
+        });
+        return Json.createObjectBuilder()
+                .add("sandwichs", sandwichs.build())
+                .build();
+    }
+    
+    private JsonObject buildJsonForSandwich(Sandwich s) {
+        JsonObject details = Json.createObjectBuilder()
+                .add("id", s.getId())
+                .add("nom", s.getNom())
+                .add("description", s.getDescr())
+                .add("pain", s.getType_pain())
+                .build();
+
+        JsonObject href = Json.createObjectBuilder()
+                .add("href", ((s.getImg() == null) ? "" : s.getImg()))
+                .build();
+
+        JsonObject self = Json.createObjectBuilder()
+                .add("self", href)
+                .build();
+
+        return Json.createObjectBuilder()
+                .add("sandwich", details)
+                .add("links", self)
+                .build();
     }
 
     @POST
