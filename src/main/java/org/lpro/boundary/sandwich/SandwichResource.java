@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.Optional;
+import org.lpro.entity.Category;
 
 @Stateless
 @Path("sandwichs")
@@ -39,8 +40,34 @@ public class SandwichResource {
     @Path("{id}")
     public Response getSandwich(@PathParam("id") long id, @Context UriInfo uriInfo) {
         return Optional.ofNullable(sandwichManager.findById(id))
-                .map(c -> Response.ok(c).build())
+                .map(c -> Response.ok(buildJson(c)).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    @GET
+    @Path("{id}/categories")
+    public Response getCategories(@PathParam("id") long id) {
+        return Optional.ofNullable(this.sandwichManager.findById(id))
+                .map(s -> Response.ok(buildCategories(s)).build())
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    private JsonObject buildCategories(Sandwich s) {
+        JsonArrayBuilder categories = Json.createArrayBuilder();
+        s.getCategory().forEach((c) -> {
+            categories.add(buildJsonForCategory(c));
+        });
+        return Json.createObjectBuilder()
+                .add("categories", categories.build())
+                .build();
+    }
+
+    private JsonObject buildJsonForCategory(Category category) {
+        return Json.createObjectBuilder()
+                .add("id", category.getId())
+                .add("nom", category.getNom())
+                .add("descr", category.getDescr())
+                .build();
     }
 
     @GET

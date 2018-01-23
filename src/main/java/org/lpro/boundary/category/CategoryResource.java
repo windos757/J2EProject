@@ -43,13 +43,10 @@ public class CategoryResource {
     @Path("{id}")
     public Response getCategory(@PathParam("id") long id, @Context UriInfo uriInfo) {
         return Optional.ofNullable(categoryManager.findById(id))
-                //.map(c -> Response.ok(category2Json(c)).build())
-                .map(c -> Response.ok(c).build())
-                //.orElseThrow(() -> new CategoryNotFound("Ressource non disponible " + uriInfo.getPath()))
+                .map(c -> Response.ok(buildJson(c)).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
-  
-    
+
     @GET
     @Path("{id}/sandwichs")
     public Response getSandwichs(@PathParam("id") long id) {
