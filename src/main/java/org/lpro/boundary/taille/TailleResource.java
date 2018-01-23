@@ -1,6 +1,6 @@
-package org.lpro.boundary.category;
+package org.lpro.boundary.taille;
 
-import org.lpro.entity.Category;
+import org.lpro.entity.Taille;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -20,29 +20,29 @@ import java.util.Set;
 import org.lpro.entity.Sandwich;
 
 @Stateless
-@Path("categories")
+@Path("tailles")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class CategoryResource {
+public class TailleResource {
 
     @Inject
-    CategoryManager categoryManager;
+    TailleManager TailleManager;
 
     
     
     @GET
-    public Response getCategories() {
+    public Response getTailles() {
         JsonObject json = Json.createObjectBuilder()
                 .add("type", "collection")
-                .add("categories", getCategoriesList())
+                .add("tailles", getTaillesList())
                 .build();
         return Response.ok(json).build();
     }
     
     @GET
     @Path("{id}")
-    public Response getCategory(@PathParam("id") long id, @Context UriInfo uriInfo) {
-        return Optional.ofNullable(categoryManager.findById(id))
+    public Response getTaille(@PathParam("id") long id, @Context UriInfo uriInfo) {
+        return Optional.ofNullable(TailleManager.findById(id))
                 .map(c -> Response.ok(buildJson(c)).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
@@ -50,14 +50,14 @@ public class CategoryResource {
     @GET
     @Path("{id}/sandwichs")
     public Response getSandwichs(@PathParam("id") long id) {
-        return Optional.ofNullable(this.categoryManager.findById(id))
+        return Optional.ofNullable(this.TailleManager.findById(id))
                 .map(c -> Response.ok(buildSandwichs(c)).build())
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
     
-    private JsonObject buildSandwichs(Category c) {
+    private JsonObject buildSandwichs(Taille t) {
         JsonArrayBuilder sandwichs = Json.createArrayBuilder();
-        c.getSandwich().forEach((s) -> {
+        t.getSandwich().forEach((s) -> {
             sandwichs.add(buildJsonForSandwich(s));
         });
         return Json.createObjectBuilder()
@@ -88,8 +88,8 @@ public class CategoryResource {
     }
 
     @POST
-    public Response createCategory(@Valid Category category, @Context UriInfo uriInfo) {
-        Category newOne = this.categoryManager.save(category);
+    public Response createTaille(@Valid Taille taille, @Context UriInfo uriInfo) {
+        Taille newOne = this.TailleManager.save(taille);
         long id = newOne.getId();
         URI uri = uriInfo.getAbsolutePathBuilder().path("/" + id).build();
         return Response.created(uri).build();
@@ -97,38 +97,38 @@ public class CategoryResource {
 
     @DELETE
     @Path("{id}")
-    public Response deleteCategory(@PathParam("id") long id) {
-        this.categoryManager.delete(id);
+    public Response deleteTaille(@PathParam("id") long id) {
+        this.TailleManager.delete(id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @PUT
     @Path("{id}")
-    public Category updateCategory(@PathParam("id") long id, Category category) {
-        category.setId(id);
-        return this.categoryManager.save(category);
+    public Taille updateTaille(@PathParam("id") long id, Taille taille) {
+        taille.setId(id);
+        return this.TailleManager.save(taille);
     }
 
-    private JsonObject category2Json(Category category) {
+    private JsonObject Taille2Json(Taille taille) {
         return Json.createObjectBuilder()
                 .add("type", "resource")
-                .add("category", buildJson(category))
+                .add("tailles", buildJson(taille))
                 .build();
     }
 
-    private JsonArray getCategoriesList() {
+    private JsonArray getTaillesList() {
         JsonArrayBuilder jab = Json.createArrayBuilder();
-        this.categoryManager.findAll().forEach((c) -> {
+        this.TailleManager.findAll().forEach((c) -> {
             jab.add(buildJson(c));
         });
         return jab.build();
     }
 
-    private JsonObject buildJson(Category category) {
+    private JsonObject buildJson(Taille taille) {
         return Json.createObjectBuilder()
-                .add("id", category.getId())
-                .add("nom", category.getNom())
-                .add("descr", category.getDescr())
+                .add("id", taille.getId())
+                .add("nom", taille.getNom())
+                .add("prix", taille.getPrix())
                 .build();
     }
 }
