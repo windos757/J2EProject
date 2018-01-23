@@ -17,6 +17,7 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.Optional;
 import org.lpro.entity.Category;
+import org.lpro.entity.Taille;
 
 @Stateless
 @Path("sandwichs")
@@ -27,14 +28,6 @@ public class SandwichResource {
     @Inject
     SandwichManager sandwichManager;
 
-//    @GET
-//    public Response getSandwichs() {
-//        JsonObject json = Json.createObjectBuilder()
-//                .add("type", "collection")
-//                .add("sandwichs", getSandwichsList())
-//                .build();
-//        return Response.ok(json).build();
-//    }
     
     @GET
     @Path("{id}")
@@ -67,6 +60,32 @@ public class SandwichResource {
                 .add("id", category.getId())
                 .add("nom", category.getNom())
                 .add("descr", category.getDescr())
+                .build();
+    }
+
+    @GET
+    @Path("{id}/tailles")
+    public Response getTailles(@PathParam("id") long id) {
+        return Optional.ofNullable(this.sandwichManager.findById(id))
+                .map(s -> Response.ok(buildTailles(s)).build())
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    private JsonObject buildTailles(Sandwich s) {
+        JsonArrayBuilder tailles = Json.createArrayBuilder();
+        s.getTailles().forEach((t) -> {
+            tailles.add(buildJsonForTaille(t));
+        });
+        return Json.createObjectBuilder()
+                .add("tailles", tailles.build())
+                .build();
+    }
+
+    private JsonObject buildJsonForTaille(Taille taille) {
+        return Json.createObjectBuilder()
+                .add("id", taille.getId())
+                .add("nom", taille.getNom())
+                .add("prix", taille.getPrix())
                 .build();
     }
 
