@@ -8,6 +8,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -45,11 +46,16 @@ public class SandwichResource {
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 
-    private JsonObject buildCategories(Sandwich s) {
+    private JsonArrayBuilder buildArrayCategories(Sandwich s){
         JsonArrayBuilder categories = Json.createArrayBuilder();
         s.getCategory().forEach((c) -> {
             categories.add(buildJsonForCategory(c));
         });
+        return categories;
+    }
+
+    private JsonObject buildCategories(Sandwich s) {
+        JsonArrayBuilder categories = this.buildArrayCategories(s);
         return Json.createObjectBuilder()
                 .add("categories", categories.build())
                 .build();
@@ -71,11 +77,16 @@ public class SandwichResource {
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 
-    private JsonObject buildTailles(Sandwich s) {
+    private JsonArrayBuilder buildArrayTailles(Sandwich s){
         JsonArrayBuilder tailles = Json.createArrayBuilder();
         s.getTailles().forEach((t) -> {
             tailles.add(buildJsonForTaille(t));
         });
+        return tailles;
+    }
+
+    private JsonObject buildTailles(Sandwich s) {
+        JsonArrayBuilder tailles = this.buildArrayTailles(s);
         return Json.createObjectBuilder()
                 .add("tailles", tailles.build())
                 .build();
@@ -142,36 +153,25 @@ public class SandwichResource {
                 .add("nom", s.getNom())
                 .add("description", s.getDescr())
                 .add("pain", s.getType_pain())
-                .build();
-
-        JsonObject href = Json.createObjectBuilder()
-                .add("href", ((s.getImg() == null) ? "" : s.getImg()))
-                .build();
-
-        JsonObject self = Json.createObjectBuilder()
-                .add("self", href)
+                .add("img", ((s.getImg() == null) ? "" : s.getImg()))
+                .add("tailles", buildArrayTailles(s).build())
+                .add("categories", buildArrayCategories(s).build())
                 .build();
 
         return Json.createObjectBuilder()
                 .add("sandwich", details)
-                .add("links", self)
-                .build();
-    }
-
-    private JsonObject sandwich2Json(Sandwich s) {
-        return Json.createObjectBuilder()
-                .add("type", "resource")
-                .add("sandwich", Json.createObjectBuilder()
-                        .add("id", s.getId())
-                        .add("nom", s.getNom())
-                        .add("description", s.getDescr())
-                        .add("pain", s.getType_pain())
-                        .build())
                 .add("links", Json.createObjectBuilder()
                         .add("self", Json.createObjectBuilder()
-                                .add("href", ((s.getImg() == null) ? "" : s.getImg()))
+                                .add("href", "/sandwichs/"+s.getId())
+                                .build())
+                        .add("tailles", Json.createObjectBuilder()
+                                .add("href","/sandwichs/"+s.getId()+"/tailles")
+                                .build())
+                        .add("categories", Json.createObjectBuilder()
+                                .add("href","/sandwichs/"+s.getId()+"/categories")
                                 .build())
                         .build())
                 .build();
     }
+
 }
