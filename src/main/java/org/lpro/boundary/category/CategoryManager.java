@@ -19,7 +19,7 @@ public class CategoryManager {
     public List<Category> findAll() {
         Query q = this.em.createNamedQuery("Category.findAll", Category.class);
         q.setHint("javax.persistence.cache.storeMode", CacheStoreMode.REFRESH);
-        return q.getResultList();
+        return q.getResultList(); 
     }
 
     public Category save(Category category) {
