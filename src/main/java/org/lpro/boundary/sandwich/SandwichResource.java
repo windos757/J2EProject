@@ -34,7 +34,7 @@ public class SandwichResource {
 //                .build();
 //        return Response.ok(json).build();
 //    }
-
+    
     @GET
     @Path("{id}")
     public Response getSandwich(@PathParam("id") long id, @Context UriInfo uriInfo) {

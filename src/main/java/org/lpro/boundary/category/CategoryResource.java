@@ -48,7 +48,6 @@ public class CategoryResource {
                 //.orElseThrow(() -> new CategoryNotFound("Ressource non disponible " + uriInfo.getPath()))
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
-        
   
     
     @GET

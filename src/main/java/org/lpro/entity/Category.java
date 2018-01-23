@@ -46,7 +46,6 @@ public class Category implements Serializable {
         return this.sandwich;
     }
     
-    
     public void setSandwich(Set<Sandwich> s){
         this.sandwich = s;
     }
