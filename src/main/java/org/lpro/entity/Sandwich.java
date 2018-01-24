@@ -59,10 +59,14 @@ public class Sandwich implements Serializable{
 
     @ManyToMany(mappedBy = "sandwich")
     private Set<Category> category = new HashSet<Category>();
+
+    @ManyToMany(mappedBy = "sandwich")
+    private Set<Commande> commandes = new HashSet<Commande>();
     
     public Sandwich() {
 
     }
+
 
     public Sandwich(long id, String nom, String description, String type_pain, String img) {
         this.id = id;
@@ -70,6 +74,15 @@ public class Sandwich implements Serializable{
         this.description = description;
         this.type_pain = type_pain ;
         this.img = img ;
+    }
+
+
+    public Set<Commande> getCommandes() {
+        return commandes;
+    }
+
+    public void setCommandes(Set<Commande> commandes) {
+        this.commandes = commandes;
     }
 
     public String getDescription() {
