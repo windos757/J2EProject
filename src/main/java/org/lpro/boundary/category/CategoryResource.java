@@ -18,11 +18,16 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.Set;
 import org.lpro.entity.Sandwich;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Stateless
 @Path("categories")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Api(value = "CATEGORY")
 public class CategoryResource {
 
     @Inject
@@ -31,6 +36,11 @@ public class CategoryResource {
     
     
     @GET
+    @ApiOperation(value = "Récupère toutes les catégories", notes = "Renvoie le JSON associé à la collection de catégories")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response getCategories() {
         JsonObject json = Json.createObjectBuilder()
                 .add("type", "collection")

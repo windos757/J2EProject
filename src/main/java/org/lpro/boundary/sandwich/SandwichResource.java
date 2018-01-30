@@ -1,5 +1,9 @@
 package org.lpro.boundary.sandwich;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.lpro.entity.Sandwich;
 
 import javax.ejb.Stateless;
@@ -24,6 +28,7 @@ import org.lpro.entity.Taille;
 @Path("sandwichs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Api(value = "SANDWICH")
 public class SandwichResource {
 
     @Inject
@@ -32,6 +37,11 @@ public class SandwichResource {
     
     @GET
     @Path("{id}")
+    @ApiOperation(value = "Récupère un sandwich", notes = "Renvoie le JSON associé au sandwich")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response getSandwich(@PathParam("id") long id, @Context UriInfo uriInfo) {
         return Optional.ofNullable(sandwichManager.findById(id))
                 .map(c -> Response.ok(buildJson(c)).build())
