@@ -23,7 +23,14 @@ public class JAXRSConfiguration extends Application {
         classes.add(org.lpro.boundary.sandwich.SandwichResource.class);
         classes.add(org.lpro.boundary.sandwich.SandwichNotFound.class);
         classes.add(org.lpro.boundary.sandwich.SandwichNotFoundMapper.class);
-        classes.add(org.lpro.boundary.sandwich.SandwichManager.class);
+        
+        classes.add(org.lpro.boundary.commande.CommandeResource.class);
+        classes.add(org.lpro.boundary.commande.CommandeNotFound.class);
+        classes.add(org.lpro.boundary.commande.CommandeNotFoundMapper.class);
+        
+        classes.add(org.lpro.boundary.taille.TailleResource.class);
+        classes.add(org.lpro.boundary.taille.TailleNotFound.class);
+        classes.add(org.lpro.boundary.taille.TailleNotFoundMapper.class);
         classes.add(com.github.phillipkruger.apiee.ApieeService.class);
         return classes;
     }

@@ -1,4 +1,5 @@
 package org.lpro.boundary.commande;
+import io.swagger.annotations.Api;
 import org.lpro.entity.Sandwich;
 
 import java.net.URI;
@@ -27,6 +28,7 @@ import java.time.ZoneId;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("commandes")
+@Api(value = "COMMANDE")
 public class CommandeResource {
 
     @Inject
