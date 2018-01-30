@@ -85,6 +85,13 @@ public class CommandeResource {
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
+    @POST
+    @path("/{commandeId}/add")
+    public Response addSandwich(@PathParam("commandeId") String commandeId,
+                                @DefaultValue("") @QueryParam("token") String tokenParam,
+                                @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader
+                                )
+
     private JsonObject buildCommandeObject(Commande c) {
         return Json.createObjectBuilder()
                 .add("commande", buildJsonForCommande(c))

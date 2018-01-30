@@ -29,6 +29,10 @@ public class Commande implements Serializable {
 
     private String dateLivraison;
     private String heureLivraison;
+
+    @Pattern (regexp = "non traitée|en cours|traitée|payée")
+    private String state;
+
     private String token;
 
     @ManyToMany
@@ -37,11 +41,20 @@ public class Commande implements Serializable {
     public Commande() {
     }
 
-    public Commande(String nom, String mail, String dateLivraison, String heureLivraison) {
+    public Commande(String nom, String mail, String dateLivraison, String heureLivraison, String state) {
         this.nom = nom;
         this.mail = mail;
         this.dateLivraison = dateLivraison;
         this.heureLivraison = heureLivraison;
+        this.state = state;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public Set<Sandwich> getSandwich() {
