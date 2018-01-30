@@ -1,4 +1,5 @@
 package org.lpro.boundary.commande;
+import org.lpro.entity.Sandwich;
 
 import java.net.URI;
 import java.text.ParseException;
@@ -8,6 +9,8 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -75,7 +78,7 @@ public class CommandeResource {
                 Commande newCommande = this.commandeManager.save(commande);
                 URI uri = uriInfo.getAbsolutePathBuilder().path(newCommande.getId()).build();
                 return Response.created(uri)
-                        .entity(newCommande)
+                        .entity(buildCommandeResponse(newCommande))
                         .build();
             }
         }catch(ParseException e){ }
@@ -88,19 +91,68 @@ public class CommandeResource {
                 .build();
     }
 
-    private JsonObject buildJsonForCommande(Commande c) {
+    private JsonObject buildCommandeResponse(Commande c){
+        return Json.createObjectBuilder()
+                .add("commande", buildJsonForResponse(c))
+                .build();
+    }
+
+    private JsonObject buildJsonForResponse(Commande c){
         return Json.createObjectBuilder()
                 .add("id", c.getId())
+                .add("mail_client", c.getMail())
+                .add("livraison", buildJsonForLivraison(c))
+                .add("id", c.getId())
+                .add("token", c.getToken())
+                .build();
+    }
+
+    private JsonObject buildJsonForCommande(Commande c) {
+        return Json.createObjectBuilder()
                 .add("nom_client", c.getNom())
                 .add("mail_client", c.getMail())
                 .add("livraison", buildJsonForLivraison(c))
+                .add("id", c.getId())
                 .add("token", c.getToken())
+                .add("sandwichs", buildArraySandwichs(c))
                 .build();
     }
 
     private JsonObject buildJsonForLivraison(Commande c) {
         return Json.createObjectBuilder()
                 .add("date", c.getDateLivraison())
+                .add("heure", c.getHeureLivraison())
+                .build();
+    }
+
+    private JsonArrayBuilder buildArraySandwichs(Commande c){
+        JsonArrayBuilder sandwichs = Json.createArrayBuilder();
+        c.getSandwich().forEach((s) -> {
+            sandwichs.add(buildJsonForSandwich(s));
+        });
+        return sandwichs;
+    }
+
+
+    private JsonObject buildJsonForSandwich(Sandwich s) {
+        JsonObject details = Json.createObjectBuilder()
+                .add("id", s.getId())
+                .add("nom", s.getNom())
+                .add("description", s.getDescr())
+                .add("pain", s.getType_pain())
+                .build();
+
+        JsonObject href = Json.createObjectBuilder()
+                .add("href", ((s.getImg() == null) ? "" : s.getImg()))
+                .build();
+
+        JsonObject self = Json.createObjectBuilder()
+                .add("self", href)
+                .build();
+
+        return Json.createObjectBuilder()
+                .add("sandwich", details)
+                .add("links", self)
                 .build();
     }
 }
