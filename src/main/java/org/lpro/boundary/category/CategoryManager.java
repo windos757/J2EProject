@@ -1,5 +1,6 @@
 package org.lpro.boundary.category;
 
+import io.swagger.annotations.Api;
 import org.lpro.entity.Category;
 
 import javax.ejb.Stateless;

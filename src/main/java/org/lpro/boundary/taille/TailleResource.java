@@ -1,5 +1,6 @@
 package org.lpro.boundary.taille;
 
+import io.swagger.annotations.Api;
 import org.lpro.entity.Taille;
 
 import javax.ejb.Stateless;
@@ -23,6 +24,7 @@ import org.lpro.entity.Sandwich;
 @Path("tailles")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Api(value = "TAILLE")
 public class TailleResource {
 
     @Inject

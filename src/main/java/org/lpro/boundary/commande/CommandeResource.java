@@ -1,4 +1,5 @@
 package org.lpro.boundary.commande;
+import io.swagger.annotations.Api;
 import org.lpro.entity.Sandwich;
 
 import java.net.URI;
@@ -27,6 +28,7 @@ import java.time.ZoneId;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("commandes")
+@Api(value = "COMMANDE")
 public class CommandeResource {
 
     @Inject
@@ -84,13 +86,6 @@ public class CommandeResource {
         }catch(ParseException e){ }
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
-
-    @POST
-    @path("/{commandeId}/add")
-    public Response addSandwich(@PathParam("commandeId") String commandeId,
-                                @DefaultValue("") @QueryParam("token") String tokenParam,
-                                @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader
-                                )
 
     private JsonObject buildCommandeObject(Commande c) {
         return Json.createObjectBuilder()
