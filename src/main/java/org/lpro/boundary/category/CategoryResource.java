@@ -51,6 +51,13 @@ public class CategoryResource {
     
     @GET
     @Path("{id}")
+    @ApiOperation(value = "Récupère la catégorie", notes = "Renvoie le JSON associé à la catégorie")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")
+        , 
+        @ApiResponse(code = 404, message = "Not found")})
     public Response getCategory(@PathParam("id") long id, @Context UriInfo uriInfo) {
         return Optional.ofNullable(categoryManager.findById(id))
                 .map(c -> Response.ok(buildJson(c)).build())
@@ -59,6 +66,13 @@ public class CategoryResource {
 
     @GET
     @Path("{id}/sandwichs")
+    @ApiOperation(value = "Récupère tous les sandwichs associés à la catégorie", notes = "Renvoie le JSON associé aux sandwichs de la catégorie")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")
+        , 
+        @ApiResponse(code = 404, message = "Not found")})
     public Response getSandwichs(@PathParam("id") long id) {
         return Optional.ofNullable(this.categoryManager.findById(id))
                 .map(c -> Response.ok(buildSandwichs(c)).build())
@@ -79,7 +93,7 @@ public class CategoryResource {
         JsonObject details = Json.createObjectBuilder()
                 .add("id", s.getId())
                 .add("nom", s.getNom())
-                .add("description", s.getDescr())
+                .add("description", s.getDescription())
                 .add("pain", s.getType_pain())
                 .build();
 
@@ -98,6 +112,11 @@ public class CategoryResource {
     }
 
     @POST
+    @ApiOperation(value = "Créé la catégorie", notes = "Renvoie le JSON associé à la catégorie")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response createCategory(@Valid Category category, @Context UriInfo uriInfo) {
         Category newOne = this.categoryManager.save(category);
         long id = newOne.getId();
@@ -107,6 +126,11 @@ public class CategoryResource {
 
     @DELETE
     @Path("{id}")
+    @ApiOperation(value = "Supprime la catégorie", notes = "Renvoie le JSON associé à la catégorie")
+    @ApiResponses(value = {
+        @ApiResponse(code = 204, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response deleteCategory(@PathParam("id") long id) {
         this.categoryManager.delete(id);
         return Response.status(Response.Status.NO_CONTENT).build();
@@ -114,6 +138,11 @@ public class CategoryResource {
 
     @PUT
     @Path("{id}")
+    @ApiOperation(value = "Modifie la catégorie ou ajoute si inexistante", notes = "Renvoie le JSON associé à la catégorie")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Category updateCategory(@PathParam("id") long id, Category category) {
         category.setId(id);
         return this.categoryManager.save(category);

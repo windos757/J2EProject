@@ -50,6 +50,13 @@ public class SandwichResource {
 
     @GET
     @Path("{id}/categories")
+    @ApiOperation(value = "Récupère toutes les catégories associées au sandwich", notes = "Renvoie le JSON associé aux catégories du sandwich")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")
+        , 
+        @ApiResponse(code = 404, message = "Not found")})
     public Response getCategories(@PathParam("id") long id) {
         return Optional.ofNullable(this.sandwichManager.findById(id))
                 .map(s -> Response.ok(buildCategories(s)).build())
@@ -81,6 +88,13 @@ public class SandwichResource {
 
     @GET
     @Path("{id}/tailles")
+    @ApiOperation(value = "Récupère toutes les tailles associées au sandwich", notes = "Renvoie le JSON associé aux tailles du sandwich")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")
+        , 
+        @ApiResponse(code = 404, message = "Not found")})
     public Response getTailles(@PathParam("id") long id) {
         return Optional.ofNullable(this.sandwichManager.findById(id))
                 .map(s -> Response.ok(buildTailles(s)).build())
@@ -111,6 +125,11 @@ public class SandwichResource {
     }
 
     @GET
+    @ApiOperation(value = "Récupère touts les sandwichs", notes = "Renvoie le JSON associé à la collection de sandwichs")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response getSandwichs(
             @DefaultValue("1") @QueryParam("page") int page,
             @DefaultValue("10") @QueryParam("size") int nbPerPage,
@@ -126,6 +145,11 @@ public class SandwichResource {
     }
 
     @POST
+    @ApiOperation(value = "Créé le sandwich", notes = "Renvoie le JSON associé au sandwich")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response createSandwich(@Valid Sandwich sandwich, @Context UriInfo uriInfo) {
         Sandwich newOne = this.sandwichManager.save(sandwich);
         long id = newOne.getId();
@@ -135,6 +159,11 @@ public class SandwichResource {
 
     @DELETE
     @Path("{id}")
+    @ApiOperation(value = "Supprime le sandwich", notes = "Renvoie le JSON associé au sandwich")
+    @ApiResponses(value = {
+        @ApiResponse(code = 204, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response deleteSandwich(@PathParam("id") long id) {
         this.sandwichManager.delete(id);
         return Response.status(Response.Status.NO_CONTENT).build();
@@ -142,6 +171,11 @@ public class SandwichResource {
 
     @PUT
     @Path("{id}")
+    @ApiOperation(value = "Modifie le sandwich ou ajoute si inexistante", notes = "Renvoie le JSON associé au sandwich")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Sandwich updateSandwich(@PathParam("id") long id, Sandwich sandwich) {
         sandwich.setId(id);
         return this.sandwichManager.save(sandwich);
@@ -161,7 +195,7 @@ public class SandwichResource {
         JsonObject details = Json.createObjectBuilder()
                 .add("id", s.getId())
                 .add("nom", s.getNom())
-                .add("description", s.getDescr())
+                .add("description", s.getDescription())
                 .add("pain", s.getType_pain())
                 .add("img", ((s.getImg() == null) ? "" : s.getImg()))
                 .add("tailles", buildArrayTailles(s).build())

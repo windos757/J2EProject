@@ -1,6 +1,9 @@
 package org.lpro.boundary.taille;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.lpro.entity.Taille;
 
 import javax.ejb.Stateless;
@@ -33,6 +36,11 @@ public class TailleResource {
     
     
     @GET
+    @ApiOperation(value = "Récupère toutes les tailles", notes = "Renvoie le JSON associé à la collection de tailles")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response getTailles() {
         JsonObject json = Json.createObjectBuilder()
                 .add("type", "collection")
@@ -43,6 +51,13 @@ public class TailleResource {
     
     @GET
     @Path("{id}")
+    @ApiOperation(value = "Récupère la taille", notes = "Renvoie le JSON associé à la taille")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")
+        , 
+        @ApiResponse(code = 404, message = "Not found")})
     public Response getTaille(@PathParam("id") long id, @Context UriInfo uriInfo) {
         return Optional.ofNullable(TailleManager.findById(id))
                 .map(c -> Response.ok(buildJson(c)).build())
@@ -51,6 +66,13 @@ public class TailleResource {
 
     @GET
     @Path("{id}/sandwichs")
+    @ApiOperation(value = "Récupère tous les sandwichs associés à la taille", notes = "Renvoie le JSON associé aux sandwichs de la taille")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")
+        , 
+        @ApiResponse(code = 404, message = "Not found")})
     public Response getSandwichs(@PathParam("id") long id) {
         return Optional.ofNullable(this.TailleManager.findById(id))
                 .map(c -> Response.ok(buildSandwichs(c)).build())
@@ -71,7 +93,7 @@ public class TailleResource {
         JsonObject details = Json.createObjectBuilder()
                 .add("id", s.getId())
                 .add("nom", s.getNom())
-                .add("description", s.getDescr())
+                .add("description", s.getDescription())
                 .add("pain", s.getType_pain())
                 .build();
 
@@ -90,6 +112,11 @@ public class TailleResource {
     }
 
     @POST
+    @ApiOperation(value = "Créé la taille", notes = "Renvoie le JSON associé à la taille")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response createTaille(@Valid Taille taille, @Context UriInfo uriInfo) {
         Taille newOne = this.TailleManager.save(taille);
         long id = newOne.getId();
@@ -99,6 +126,11 @@ public class TailleResource {
 
     @DELETE
     @Path("{id}")
+    @ApiOperation(value = "Supprime la taille", notes = "Renvoie le JSON associé à la taille")
+    @ApiResponses(value = {
+        @ApiResponse(code = 204, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Response deleteTaille(@PathParam("id") long id) {
         this.TailleManager.delete(id);
         return Response.status(Response.Status.NO_CONTENT).build();
@@ -106,6 +138,11 @@ public class TailleResource {
 
     @PUT
     @Path("{id}")
+    @ApiOperation(value = "Modifie la taille ou ajoute si inexistante", notes = "Renvoie le JSON associé à la taille")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK")
+        ,
+        @ApiResponse(code = 500, message = "Internal server error")})
     public Taille updateTaille(@PathParam("id") long id, Taille taille) {
         taille.setId(id);
         return this.TailleManager.save(taille);
