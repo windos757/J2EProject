@@ -137,6 +137,46 @@ public class CommandeResource {
                 .build();
     }
 
+    @PUT
+    @Path("/{commandeId}")
+    public Response UpdateCommande(@PathParam("commandeId") String commandeId,
+                                   @DefaultValue("") @QueryParam("token") String tokenParam,
+                                   @DefaultValue("") @QueryParam("dateLivraison") String newDate,
+                                   @DefaultValue("") @QueryParam("heureLivraison") String newHour,
+                                   @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader) {
+        Commande c = this.commandeManager.findById(commandeId);
+        if(newDate.equals("")){
+            newDate=c.getDateLivraison();
+        }
+        if(newHour.equals("")){
+            newHour=c.getHeureLivraison();
+        }
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+            sdf.setTimeZone(TimeZone.getDefault());
+
+            Date current = Date.from(LocalDateTime.now()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant());
+
+            Date commandeDate = sdf.parse(newDate + " " + newHour);
+
+            Timestamp currentTimestamp = new Timestamp(current.getTime());
+            Timestamp commandeDateTimestamp = new Timestamp(commandeDate.getTime());
+
+            if (currentTimestamp.before(commandeDateTimestamp)){
+                c.setDateLivraison(newDate);
+                c.setHeureLivraison(newHour);
+                Commande newCommande = this.commandeManager.update(c);
+                URI uri = uriInfo.getAbsolutePathBuilder().path(newCommande.getId()).build();
+                return Response.accepted(uri)
+                        .entity(buildCommandeResponse(newCommande))
+                        .build();
+            }
+        }catch(ParseException e){ }
+        return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
     private JsonObject buildCommandeObject(Commande c) {
         return Json.createObjectBuilder()
                 .add("commande", buildJsonForCommande(c))
