@@ -118,10 +118,6 @@ public class Sandwich implements Serializable{
         return this.nom;
     }
 
-    public String getDescr() {
-        return this.description;
-    }
-
     public String getType_pain() { return this.type_pain; }
 
     public String getImg() { return this.img; }
@@ -132,10 +128,6 @@ public class Sandwich implements Serializable{
 
     public void setNom(String nom) {
         this.nom = nom;
-    }
-
-    public void setDescr(String descr) {
-        this.description = descr;
     }
 
     public void setType_pain(String type_pain) { this.type_pain = type_pain; }

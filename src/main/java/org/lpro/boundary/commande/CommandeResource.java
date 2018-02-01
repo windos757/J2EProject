@@ -165,7 +165,7 @@ public class CommandeResource {
         JsonObject details = Json.createObjectBuilder()
                 .add("id", s.getId())
                 .add("nom", s.getNom())
-                .add("description", s.getDescr())
+                .add("description", s.getDescription())
                 .add("pain", s.getType_pain())
                 .build();
 
