@@ -40,4 +40,6 @@ public class CommandeManager {
         // Persister la commande dans la BD
         return this.em.merge(c);
     }
+
+
 }

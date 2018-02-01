@@ -87,6 +87,31 @@ public class CommandeResource {
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
+    @POST
+    @Path("/{commandeId}/add")
+    public Response addSandwich(@PathParam("commandeId") String commandeId,
+                                @DefaultValue("") @QueryParam("token") String tokenParam,
+                                @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader,
+                                @valid CommandeItem commandeItem) {
+        Commande c = Commande.getId(commandeId);
+        HashSet<CommandeItem> ci = c.getCommandeItem();
+        ci.forEach((item) -> {
+            if ( item.getSandwich().equals(commandeItem.getSandwich()) &&
+                    item.getTaille().equals(commandeItem.getTaille())){
+                item.setQuantity(item.getQuantity()+commandeItem.getQuantity());
+            } else {
+                ci.add(commandeItem);
+
+            }
+        });
+        c.setCommandeItem(ci);
+
+        this.commandeManager.save(c);
+        URI uri = uriInfo.getAbsolutePathBuilder().path(newCommande.getId()).build();
+        return
+
+    }
+
     private JsonObject buildCommandeObject(Commande c) {
         return Json.createObjectBuilder()
                 .add("commande", buildJsonForCommande(c))
