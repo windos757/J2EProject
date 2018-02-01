@@ -20,14 +20,13 @@ import javax.persistence.ManyToMany;
 public class CommandeItem implements Serializable {
 
     @Id
-    @GeneratedValue
-    private long id;
+    private String id;
 
     @NotNull
-    private String sandwich, taille;
+    private long sandwich, taille;
 
     @NotNull
-    private Int quantity;
+    private int quantity;
 
     @ManyToMany(mappedBy="commandeItem")
     private Set<Commande> commande = new HashSet<Commande>();
@@ -36,41 +35,41 @@ public class CommandeItem implements Serializable {
 
     }
 
-    public CommandeItem(String sandwich, String taille, Int quantity) {
+    public CommandeItem(long sandwich, long taille, int quantity) {
         this.sandwich = sandwich;
         this.taille = taille;
         this.quantity = quantity;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getSandwich() {
+    public long getSandwich() {
         return sandwich;
     }
 
-    public void setSandwich(String sandwich) {
+    public void setSandwich(long sandwich) {
         this.sandwich = sandwich;
     }
 
-    public String getTaille() {
+    public long getTaille() {
         return taille;
     }
 
-    public void setTaille(String taille) {
+    public void setTaille(long taille) {
         this.taille = taille;
     }
 
-    public Int getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Int quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 

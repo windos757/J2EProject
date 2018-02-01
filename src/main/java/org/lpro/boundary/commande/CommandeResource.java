@@ -1,6 +1,12 @@
 package org.lpro.boundary.commande;
+
 import io.swagger.annotations.Api;
 import org.lpro.entity.Sandwich;
+import org.lpro.entity.CommandeItem;
+import org.lpro.entity.Taille;
+import org.lpro.boundary.sandwich.*;
+import org.lpro.boundary.taille.*;
+import org.lpro.boundary.commandeItem.*;
 
 import java.net.URI;
 import java.text.ParseException;
@@ -23,6 +29,8 @@ import java.sql.Timestamp;
 import java.util.TimeZone;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashSet;
+import java.util.Set;
 
 @Stateless
 @Consumes(MediaType.APPLICATION_JSON)
@@ -33,6 +41,12 @@ public class CommandeResource {
 
     @Inject
     CommandeManager commandeManager;
+    @Inject
+    SandwichManager sandwichManager;
+    @Inject
+    TailleManager tailleManager;
+    @Inject
+    CommandeItemManager commandeItemManager;
     @Context
     UriInfo uriInfo;
 
@@ -92,24 +106,35 @@ public class CommandeResource {
     public Response addSandwich(@PathParam("commandeId") String commandeId,
                                 @DefaultValue("") @QueryParam("token") String tokenParam,
                                 @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader,
-                                @valid CommandeItem commandeItem) {
-        Commande c = Commande.getId(commandeId);
-        HashSet<CommandeItem> ci = c.getCommandeItem();
-        ci.forEach((item) -> {
-            if ( item.getSandwich().equals(commandeItem.getSandwich()) &&
-                    item.getTaille().equals(commandeItem.getTaille())){
-                item.setQuantity(item.getQuantity()+commandeItem.getQuantity());
-            } else {
-                ci.add(commandeItem);
+                                @Valid CommandeItem commandeItem) {
 
+        Commande c = this.commandeManager.findById(commandeId);
+        Set<CommandeItem> commande = c.getCommandeItem();
+
+        boolean b = commande.stream().anyMatch((item) -> {
+            if(item.getSandwich() == commandeItem.getSandwich() && item.getTaille() == commandeItem.getTaille()){
+                commandeItem.setQuantity(item.getQuantity() + commandeItem.getQuantity());
+                commandeItem.setId(item.getId());
+                item.setQuantity(item.getQuantity() + commandeItem.getQuantity());
+                return true ;
+            } else {
+                return false;
             }
         });
-        c.setCommandeItem(ci);
+        if(!b){
+            CommandeItem newItem = this.commandeItemManager.save(commandeItem);
+            commande.add(newItem);
+        }else{
+            CommandeItem ci = this.commandeItemManager.update(commandeItem);
+        }
 
-        this.commandeManager.save(c);
-        URI uri = uriInfo.getAbsolutePathBuilder().path(newCommande.getId()).build();
-        return
+        c.setCommandeItem(commande);
+        Commande comm = this.commandeManager.update(c);
 
+        URI uri = uriInfo.getAbsolutePathBuilder().path(comm.getId()).build();
+        return Response.created(uri)
+                .entity(buildCommandeObject(comm))
+                .build();
     }
 
     private JsonObject buildCommandeObject(Commande c) {
@@ -154,23 +179,24 @@ public class CommandeResource {
 
     private JsonArrayBuilder buildArraySandwichs(Commande c){
         JsonArrayBuilder sandwichs = Json.createArrayBuilder();
-        c.getSandwich().forEach((s) -> {
+        c.getCommandeItem().forEach((s) -> {
             sandwichs.add(buildJsonForSandwich(s));
         });
         return sandwichs;
     }
 
 
-    private JsonObject buildJsonForSandwich(Sandwich s) {
+    private JsonObject buildJsonForSandwich(CommandeItem s) {
+        Sandwich sand = this.sandwichManager.findById(s.getSandwich());
+        Taille t = this.tailleManager.findById(s.getTaille());
         JsonObject details = Json.createObjectBuilder()
-                .add("id", s.getId())
-                .add("nom", s.getNom())
-                .add("description", s.getDescription())
-                .add("pain", s.getType_pain())
+                .add("nom", sand.getNom())
+                .add("description", sand.getDescription())
+                .add("pain", sand.getType_pain())
                 .build();
 
         JsonObject href = Json.createObjectBuilder()
-                .add("href", ((s.getImg() == null) ? "" : s.getImg()))
+                .add("href", ((sand.getImg() == null) ? "" : sand.getImg()))
                 .build();
 
         JsonObject self = Json.createObjectBuilder()
@@ -180,6 +206,8 @@ public class CommandeResource {
         return Json.createObjectBuilder()
                 .add("sandwich", details)
                 .add("links", self)
+                .add("taille", t.getNom())
+                .add("quantité", s.getQuantity())
                 .build();
     }
 }

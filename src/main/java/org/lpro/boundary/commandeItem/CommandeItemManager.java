@@ -16,7 +16,7 @@ import org.lpro.entity.CommandeItem;
 public class CommandeItemManager {
 
     @PersistenceContext
-    CommandeItem ci;
+    EntityManager em;
 
     public CommandeItem findById(String id) {
         return this.em.find(CommandeItem.class, id);
@@ -28,9 +28,12 @@ public class CommandeItemManager {
         return q.getResultList();
     }
 
-    public CommandeItem save(CommandeItem c) {
+    public CommandeItem update(CommandeItem c) {
+        return this.em.merge(c);
+    }
+
+    public CommandeItem save(CommandeItem c){
         c.setId(UUID.randomUUID().toString());
-        // Persister la commande dans la BD
         return this.em.merge(c);
     }
 }
