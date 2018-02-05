@@ -14,8 +14,9 @@ What things you need to install the software and how to install them
 
 ## Running the tests
 
-mvn clean install
 
+mvn clean install
+An api documentation is available on : localhost:8080/td2/api/apiee
 
 
 ## Built With
