@@ -60,8 +60,6 @@ public class Sandwich implements Serializable{
     @ManyToMany(mappedBy = "sandwich")
     private Set<Category> category = new HashSet<Category>();
 
-    @ManyToMany(mappedBy = "sandwich")
-    private Set<Commande> commandes = new HashSet<Commande>();
     
     public Sandwich() {
 
@@ -77,13 +75,6 @@ public class Sandwich implements Serializable{
     }
 
 
-    public Set<Commande> getCommandes() {
-        return commandes;
-    }
-
-    public void setCommandes(Set<Commande> commandes) {
-        this.commandes = commandes;
-    }
 
     public String getDescription() {
         return description;

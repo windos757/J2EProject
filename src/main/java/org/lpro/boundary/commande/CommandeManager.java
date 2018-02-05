@@ -30,7 +30,7 @@ public class CommandeManager {
     }
 
     public Commande save(Commande c) {
-        // enregistrer la commande
+
         // Ajout du token
         RandomToken rt = new RandomToken();
         String token = rt.randomString(64);
@@ -40,4 +40,9 @@ public class CommandeManager {
         // Persister la commande dans la BD
         return this.em.merge(c);
     }
+
+    public Commande update(Commande c) {
+        return this.em.merge(c);
+    }
+
 }

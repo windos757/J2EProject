@@ -36,7 +36,7 @@ public class Commande implements Serializable {
     private String token;
 
     @ManyToMany
-    private Set<Sandwich> sandwich = new HashSet<Sandwich>();
+    private Set<CommandeItem> commandeItem = new HashSet<CommandeItem>();
 
     public Commande() {
     }
@@ -57,12 +57,12 @@ public class Commande implements Serializable {
         this.state = state;
     }
 
-    public Set<Sandwich> getSandwich() {
-        return sandwich;
+    public Set<CommandeItem> getCommandeItem() {
+        return commandeItem;
     }
 
-    public void setSandwich(Set<Sandwich> sandwichs) {
-        this.sandwich = sandwichs;
+    public void setCommandeItem(Set<CommandeItem> commandeItem) {
+        this.commandeItem = commandeItem;
     }
 
     public String getId() {

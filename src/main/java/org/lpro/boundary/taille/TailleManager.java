@@ -14,7 +14,7 @@ public class TailleManager {
     @PersistenceContext
     EntityManager em;
 
-    public Taille findById(long id) {
+    public Taille findById(Long id) {
         return this.em.find(Taille.class, id);
     }
 

@@ -1,6 +1,12 @@
 package org.lpro.boundary.commande;
+
 import io.swagger.annotations.Api;
 import org.lpro.entity.Sandwich;
+import org.lpro.entity.CommandeItem;
+import org.lpro.entity.Taille;
+import org.lpro.boundary.sandwich.*;
+import org.lpro.boundary.taille.*;
+import org.lpro.boundary.commandeItem.*;
 
 import java.net.URI;
 import java.text.ParseException;
@@ -23,6 +29,8 @@ import java.sql.Timestamp;
 import java.util.TimeZone;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashSet;
+import java.util.Set;
 
 @Stateless
 @Consumes(MediaType.APPLICATION_JSON)
@@ -33,11 +41,24 @@ public class CommandeResource {
 
     @Inject
     CommandeManager commandeManager;
+    @Inject
+    SandwichManager sandwichManager;
+    @Inject
+    TailleManager tailleManager;
+    @Inject
+    CommandeItemManager commandeItemManager;
     @Context
     UriInfo uriInfo;
 
     @GET
     @Path("/{commandeId}")
+    @ApiOperation(value = "Récupère la commande d'id donné", notes = "Renvoie le JSON associé à la commande")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK")
+            ,
+            @ApiResponse(code = 500, message = "Internal server error")
+            ,
+            @ApiResponse(code = 404, message = "Not found")})
     public Response getOneCommande(@PathParam("commandeId") String commandeId,
                                    @DefaultValue("") @QueryParam("token") String tokenParam,
                                    @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader) {
@@ -62,6 +83,11 @@ public class CommandeResource {
     }
 
     @POST
+    @ApiOperation(value = "Créé la commande", notes = "Renvoie le JSON associé à la commande")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "CREATED")
+            ,
+            @ApiResponse(code = 500, message = "Internal server error")})
     public Response addCommande(@Valid Commande commande,@Context UriInfo uriInfo) {
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
@@ -80,6 +106,92 @@ public class CommandeResource {
                 Commande newCommande = this.commandeManager.save(commande);
                 URI uri = uriInfo.getAbsolutePathBuilder().path(newCommande.getId()).build();
                 return Response.created(uri)
+                        .entity(buildCommandeResponse(newCommande))
+                        .build();
+            }
+        }catch(ParseException e){ }
+        return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    @POST
+    @Path("/{commandeId}/add")
+    @ApiOperation(value = "Ajoute un sandwich à une commande", notes = "Renvoie le JSON associé à la commande")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "CREATED")
+            ,
+            @ApiResponse(code = 500, message = "Internal server error")})
+    public Response addSandwich(@PathParam("commandeId") String commandeId,
+                                @DefaultValue("") @QueryParam("token") String tokenParam,
+                                @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader,
+                                @Valid CommandeItem commandeItem) {
+
+        Commande c = this.commandeManager.findById(commandeId);
+        Set<CommandeItem> commande = c.getCommandeItem();
+
+        boolean b = commande.stream().anyMatch((item) -> {
+            if(item.getSandwich() == commandeItem.getSandwich() && item.getTaille() == commandeItem.getTaille()){
+                commandeItem.setQuantity(item.getQuantity() + commandeItem.getQuantity());
+                commandeItem.setId(item.getId());
+                item.setQuantity(item.getQuantity() + commandeItem.getQuantity());
+                return true ;
+            } else {
+                return false;
+            }
+        });
+        if(!b){
+            CommandeItem newItem = this.commandeItemManager.save(commandeItem);
+            commande.add(newItem);
+        }else{
+            CommandeItem ci = this.commandeItemManager.update(commandeItem);
+        }
+
+        c.setCommandeItem(commande);
+        Commande comm = this.commandeManager.update(c);
+
+        URI uri = uriInfo.getAbsolutePathBuilder().path(comm.getId()).build();
+        return Response.created(uri)
+                .entity(buildCommandeObject(comm))
+                .build();
+    }
+
+    @PUT
+    @Path("/{commandeId}")
+    @ApiOperation(value = "Modifie la date de la commande ", notes = "Renvoie le JSON associé à la commande")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK")
+            ,
+            @ApiResponse(code = 500, message = "Internal server error")})
+    public Response UpdateCommande(@PathParam("commandeId") String commandeId,
+                                   @DefaultValue("") @QueryParam("token") String tokenParam,
+                                   @DefaultValue("") @QueryParam("dateLivraison") String newDate,
+                                   @DefaultValue("") @QueryParam("heureLivraison") String newHour,
+                                   @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader) {
+        Commande c = this.commandeManager.findById(commandeId);
+        if(newDate.equals("")){
+            newDate=c.getDateLivraison();
+        }
+        if(newHour.equals("")){
+            newHour=c.getHeureLivraison();
+        }
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+            sdf.setTimeZone(TimeZone.getDefault());
+
+            Date current = Date.from(LocalDateTime.now()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant());
+
+            Date commandeDate = sdf.parse(newDate + " " + newHour);
+
+            Timestamp currentTimestamp = new Timestamp(current.getTime());
+            Timestamp commandeDateTimestamp = new Timestamp(commandeDate.getTime());
+
+            if (currentTimestamp.before(commandeDateTimestamp)){
+                c.setDateLivraison(newDate);
+                c.setHeureLivraison(newHour);
+                Commande newCommande = this.commandeManager.update(c);
+                URI uri = uriInfo.getAbsolutePathBuilder().path(newCommande.getId()).build();
+                return Response.accepted(uri)
                         .entity(buildCommandeResponse(newCommande))
                         .build();
             }
@@ -129,23 +241,24 @@ public class CommandeResource {
 
     private JsonArrayBuilder buildArraySandwichs(Commande c){
         JsonArrayBuilder sandwichs = Json.createArrayBuilder();
-        c.getSandwich().forEach((s) -> {
+        c.getCommandeItem().forEach((s) -> {
             sandwichs.add(buildJsonForSandwich(s));
         });
         return sandwichs;
     }
 
 
-    private JsonObject buildJsonForSandwich(Sandwich s) {
+    private JsonObject buildJsonForSandwich(CommandeItem s) {
+        Sandwich sand = this.sandwichManager.findById(s.getSandwich());
+        Taille t = this.tailleManager.findById(s.getTaille());
         JsonObject details = Json.createObjectBuilder()
-                .add("id", s.getId())
-                .add("nom", s.getNom())
-                .add("description", s.getDescription())
-                .add("pain", s.getType_pain())
+                .add("nom", sand.getNom())
+                .add("description", sand.getDescription())
+                .add("pain", sand.getType_pain())
                 .build();
 
         JsonObject href = Json.createObjectBuilder()
-                .add("href", ((s.getImg() == null) ? "" : s.getImg()))
+                .add("href", ((sand.getImg() == null) ? "" : sand.getImg()))
                 .build();
 
         JsonObject self = Json.createObjectBuilder()
@@ -155,6 +268,8 @@ public class CommandeResource {
         return Json.createObjectBuilder()
                 .add("sandwich", details)
                 .add("links", self)
+                .add("taille", t.getNom())
+                .add("quantité", s.getQuantity())
                 .build();
     }
 }
