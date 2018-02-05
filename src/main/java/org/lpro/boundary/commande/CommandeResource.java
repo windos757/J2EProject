@@ -52,6 +52,13 @@ public class CommandeResource {
 
     @GET
     @Path("/{commandeId}")
+    @ApiOperation(value = "Récupère la commande d'id donné", notes = "Renvoie le JSON associé à la commande")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK")
+            ,
+            @ApiResponse(code = 500, message = "Internal server error")
+            ,
+            @ApiResponse(code = 404, message = "Not found")})
     public Response getOneCommande(@PathParam("commandeId") String commandeId,
                                    @DefaultValue("") @QueryParam("token") String tokenParam,
                                    @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader) {
@@ -76,6 +83,11 @@ public class CommandeResource {
     }
 
     @POST
+    @ApiOperation(value = "Créé la commande", notes = "Renvoie le JSON associé à la commande")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "CREATED")
+            ,
+            @ApiResponse(code = 500, message = "Internal server error")})
     public Response addCommande(@Valid Commande commande,@Context UriInfo uriInfo) {
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
@@ -103,6 +115,11 @@ public class CommandeResource {
 
     @POST
     @Path("/{commandeId}/add")
+    @ApiOperation(value = "Ajoute un sandwich à une commande", notes = "Renvoie le JSON associé à la commande")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "CREATED")
+            ,
+            @ApiResponse(code = 500, message = "Internal server error")})
     public Response addSandwich(@PathParam("commandeId") String commandeId,
                                 @DefaultValue("") @QueryParam("token") String tokenParam,
                                 @DefaultValue("") @HeaderParam("X-lbs-token") String tokenHeader,
@@ -139,6 +156,11 @@ public class CommandeResource {
 
     @PUT
     @Path("/{commandeId}")
+    @ApiOperation(value = "Modifie la date de la commande ", notes = "Renvoie le JSON associé à la commande")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK")
+            ,
+            @ApiResponse(code = 500, message = "Internal server error")})
     public Response UpdateCommande(@PathParam("commandeId") String commandeId,
                                    @DefaultValue("") @QueryParam("token") String tokenParam,
                                    @DefaultValue("") @QueryParam("dateLivraison") String newDate,
