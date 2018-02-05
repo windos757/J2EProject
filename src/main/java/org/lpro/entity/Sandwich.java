@@ -10,6 +10,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.ManyToMany;
 
 @Entity
 @XmlRootElement
@@ -50,9 +53,18 @@ public class Sandwich implements Serializable{
     @NotNull
     private String img;
 
+
+    @ManyToMany(mappedBy = "sandwich")
+    private Set<Taille> tailles = new HashSet<Taille>();
+
+    @ManyToMany(mappedBy = "sandwich")
+    private Set<Category> category = new HashSet<Category>();
+
+    
     public Sandwich() {
 
     }
+
 
     public Sandwich(long id, String nom, String description, String type_pain, String img) {
         this.id = id;
@@ -62,16 +74,39 @@ public class Sandwich implements Serializable{
         this.img = img ;
     }
 
+
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Set<Taille> getTailles() {
+        return tailles;
+    }
+
+    public void setTailles(Set<Taille> tailles) {
+        this.tailles = tailles;
+    }
+
+    public Set<Category> getCategory(){
+        return this.category;
+    }
+    
+    
+    public void setCategory(Set<Category> c){
+        this.category = c;
+    }
+    
     public long getId() {
         return this.id;
     }
 
     public String getNom() {
         return this.nom;
-    }
-
-    public String getDescr() {
-        return this.description;
     }
 
     public String getType_pain() { return this.type_pain; }
@@ -84,10 +119,6 @@ public class Sandwich implements Serializable{
 
     public void setNom(String nom) {
         this.nom = nom;
-    }
-
-    public void setDescr(String descr) {
-        this.description = descr;
     }
 
     public void setType_pain(String type_pain) { this.type_pain = type_pain; }

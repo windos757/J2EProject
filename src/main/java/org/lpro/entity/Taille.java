@@ -16,8 +16,8 @@ import javax.persistence.ManyToMany;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@NamedQuery(name="Category.findAll", query = "SELECT c FROM Category c")
-public class Category implements Serializable {
+@NamedQuery(name="Taille.findAll", query = "SELECT t FROM Taille t")
+public class Taille implements Serializable {
 
     @Id
     @GeneratedValue
@@ -27,29 +27,29 @@ public class Category implements Serializable {
     private String nom;
 
     @NotNull
-    private String descr;
-    
+    private Double prix;
+
     @ManyToMany
     private Set<Sandwich> sandwich = new HashSet<Sandwich>();
 
-    public Category() {
+    public Taille() {
 
     }
 
-    public Category(long id, String nom, String descr) {
+    public Taille(long id, String nom, Double prix) {
         this.id = id;
         this.nom = nom;
-        this.descr = descr;
+        this.prix = prix;
     }
-    
+
     public Set<Sandwich> getSandwich(){
         return this.sandwich;
     }
-    
+
     public void setSandwich(Set<Sandwich> s){
         this.sandwich = s;
     }
-    
+
     public long getId() {
         return this.id;
     }
@@ -58,8 +58,8 @@ public class Category implements Serializable {
         return this.nom;
     }
 
-    public String getDescr() {
-        return this.descr;
+    public Double getPrix() {
+        return this.prix;
     }
 
     public void setId(long id) {
@@ -70,8 +70,8 @@ public class Category implements Serializable {
         this.nom = nom;
     }
 
-    public void setDescr(String descr) {
-        this.descr = descr;
+    public void setPrix(Double prix) {
+        this.prix = prix;
     }
 
 }
